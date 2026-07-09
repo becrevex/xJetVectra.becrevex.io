@@ -50,6 +50,51 @@ body {
   z-index: 20;
 }
 
+#weaponSelect {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: 6px;
+  align-items: flex-end;
+
+  /* Pushes the weapon buttons closer to the right edge */
+  transform: translateX(48px);
+}
+
+.weaponSelectButton {
+  width: 26px;
+  height: 26px;
+  border-radius: 3px;
+  border: 2px solid rgba(255, 255, 255, 0.85);
+  color: black;
+  font-size: 11px;
+  font-weight: 900;
+  line-height: 1;
+  text-align: center;
+  background: white;
+  padding: 0;
+}
+
+.weaponSelectButton.selected {
+  outline: 3px solid white;
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.9);
+  transform: scale(1.08);
+}
+
+.primaryWeapon {
+  background: rgb(255, 220, 60);
+}
+
+.missileWeapon {
+  background: rgb(150, 80, 255);
+  color: white;
+}
+
+.bombWeapon {
+  background: rgb(255, 90, 210);
+  color: white;
+}
+
 #cameraControls label {
   display: flex;
   flex-direction: column;
@@ -121,6 +166,10 @@ body {
   color: white;
   font-weight: bold;
   font-size: 15px;
+}
+
+#weaponCycleBtn {
+  display: none;
 }
 
 button {
