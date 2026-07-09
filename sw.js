@@ -1,4 +1,4 @@
-const CACHE_NAME = "xjetvectra-v3";
+const CACHE_NAME = "xJetVectra";
 
 const CORE_FILES = [
   "./",
