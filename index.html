@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Starfox Browser Prototype</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#000000">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Starfighter">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+   <link rel="apple-touch-icon" href="icon-192.png">
+</head>
+
+<script>
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("./sw.js");
+  }
+</script>
+<body>
+  <button id="fullscreenBtn" title="Fullscreen">⛶</button>
+
+  <canvas id="game"></canvas>
+
+  <div id="cameraControls">
+    <label>
+      Zoom
+      <input id="cameraZoom" type="range" min="-900" max="-120" value="-520">
+    </label>
+
+    <label>
+      Camera Y
+      <input id="cameraHeight" type="range" min="-120" max="120" value="120">
+    </label>
+  </div>
+
+  <div id="controls">
+    <button id="leftBtn" class="control left">L</button>
+    <button id="leftFireBtn" class="miniFire leftMini">●</button>
+
+    <button id="weaponCycleBtn" class="cycle">PRIMARY</button>
+
+    <button id="rightFireBtn" class="miniFire rightMini">●</button>
+    <button id="rightBtn" class="control right">R</button>
+  </div>
+  <script src="game.js"></script>
+</body>
+</html>

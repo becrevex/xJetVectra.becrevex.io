@@ -1,0 +1,134 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: black;
+  touch-action: none;
+  overscroll-behavior: none;
+  user-select: none;
+  font-family: system-ui, sans-serif;
+}
+
+#game {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+  background: black;
+}
+
+#fullscreenBtn {
+  position: fixed;
+  top: env(safe-area-inset-top, 10px);
+  right: 12px;
+  width: 46px;
+  height: 46px;
+  border-radius: 10px;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  background: rgba(0, 0, 0, 0.45);
+  color: white;
+  font-size: 24px;
+  z-index: 9999;
+}
+
+#fullscreenBtn:active {
+  transform: scale(0.95);
+}
+
+#cameraControls {
+  position: fixed;
+  top: 16px;
+  right: 70px;
+  color: white;
+  font-size: 13px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.35);
+  padding: 10px;
+  border-radius: 10px;
+  z-index: 20;
+}
+
+#cameraControls label {
+  display: flex;
+  flex-direction: column;
+}
+
+#controls {
+  position: fixed;
+  bottom: env(safe-area-inset-bottom, 20px);
+  left: 0;
+  right: 0;
+  height: 120px;
+  z-index: 30;
+}
+
+.control {
+  position: absolute;
+  width: 82px;
+  height: 82px;
+  border-radius: 50%;
+  border: 2px solid white;
+  background: rgba(255, 255, 255, 0.12);
+  color: white;
+  font-size: 32px;
+  font-weight: bold;
+}
+
+.left {
+  left: 20px;
+  bottom: 18px;
+}
+
+.right {
+  right: 20px;
+  bottom: 18px;
+}
+
+.miniFire {
+  position: absolute;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 2px solid white;
+  background: rgba(220, 32, 32, 0.9);
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.leftMini {
+  left: 118px;
+  bottom: 38px;
+}
+
+.rightMini {
+  right: 118px;
+  bottom: 38px;
+}
+
+.cycle {
+  position: absolute;
+  left: 50%;
+  bottom: 30px;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 56px;
+  border-radius: 14px;
+  border: 2px solid white;
+  background: rgba(44, 44, 44, 0.9);
+  color: white;
+  font-weight: bold;
+  font-size: 15px;
+}
+
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (pointer: fine) {
+  #fullscreenBtn {
+    display: none;
+  }
+}
