@@ -1,0 +1,137 @@
+// Auto-split from the last known good monolithic build. Keep scripts loaded in index.html order.
+
+// Bootstraps the game after all globals and functions are loaded.
+
+bindDirectionalTouchButton("leftBtn", "left");
+bindDirectionalTouchButton("rightBtn", "right");
+bindFireAimButton("leftFireBtn");
+bindFireAimButton("rightFireBtn");
+
+const weaponCycleBtn = document.getElementById("weaponCycleBtn");
+
+const weaponSelectButtons = {
+  PRIMARY: document.getElementById("selectPrimaryBtn"),
+  MISSILE: document.getElementById("selectMissileBtn"),
+  BOMB: document.getElementById("selectBombBtn")
+};
+
+function refreshWeaponSelectionUI() {
+  const selectedWeapon = weaponTypes[selectedWeaponIndex];
+
+  if (weaponCycleBtn) {
+    weaponCycleBtn.textContent = selectedWeapon;
+  }
+
+  for (const weapon of weaponTypes) {
+    const btn = weaponSelectButtons[weapon];
+    if (!btn) continue;
+
+    btn.classList.toggle("selected", weapon === selectedWeapon);
+  }
+}
+
+function selectWeapon(weapon, e) {
+  if (e) e.preventDefault();
+
+  const index = weaponTypes.indexOf(weapon);
+  if (index === -1) return;
+
+  selectedWeaponIndex = index;
+  refreshWeaponSelectionUI();
+}
+
+if (weaponCycleBtn) {
+  function cycleWeapon(e) {
+    e.preventDefault();
+    selectedWeaponIndex = (selectedWeaponIndex + 1) % weaponTypes.length;
+    refreshWeaponSelectionUI();
+  }
+
+  weaponCycleBtn.addEventListener("click", cycleWeapon);
+  weaponCycleBtn.addEventListener("touchstart", cycleWeapon);
+}
+
+for (const weapon of weaponTypes) {
+  const btn = weaponSelectButtons[weapon];
+  if (!btn) continue;
+
+  btn.addEventListener("click", e => selectWeapon(weapon, e));
+  btn.addEventListener("touchstart", e => selectWeapon(weapon, e));
+}
+
+refreshWeaponSelectionUI();
+
+const fullscreenBtn = document.getElementById("fullscreenBtn");
+
+if (fullscreenBtn) {
+  fullscreenBtn.addEventListener("click", async () => {
+    const root = document.documentElement;
+
+    try {
+      if (!document.fullscreenElement) {
+        await root.requestFullscreen();
+        fullscreenBtn.textContent = "X";
+      } else {
+        await document.exitFullscreen();
+        fullscreenBtn.textContent = "□";
+      }
+
+      setTimeout(resize, 250);
+    } catch (err) {
+      console.warn("Fullscreen not available:", err);
+    }
+  });
+}
+
+document.addEventListener("fullscreenchange", () => {
+  if (!fullscreenBtn) return;
+
+  fullscreenBtn.textContent = document.fullscreenElement ? "X" : "□";
+  setTimeout(resize, 250);
+});
+
+window.addEventListener("keydown", e => {
+  if (e.key === "ArrowLeft" || e.key.toLowerCase() === "a") {
+    if (!keys.left) checkDoubleTap("left");
+    keys.left = true;
+  }
+
+  if (e.key === "ArrowRight" || e.key.toLowerCase() === "d") {
+    if (!keys.right) checkDoubleTap("right");
+    keys.right = true;
+  }
+
+  if (e.key === "ArrowUp" || e.key.toLowerCase() === "w") keys.up = true;
+  if (e.key === "ArrowDown" || e.key.toLowerCase() === "s") keys.down = true;
+
+  if (e.code === "Space") {
+    e.preventDefault();
+    keys.fire = true;
+  }
+
+  if (e.key.toLowerCase() === "q") {
+    selectedWeaponIndex = (selectedWeaponIndex + 1) % weaponTypes.length;
+    if (weaponCycleBtn) weaponCycleBtn.textContent = weaponTypes[selectedWeaponIndex];
+  }
+
+  if (e.key.toLowerCase() === "e") {
+    spawnEnemy();
+  }
+
+  if (e.key.toLowerCase() === "l") {
+    startLevel(0);
+  }
+});
+
+window.addEventListener("keyup", e => {
+  if (e.key === "ArrowLeft" || e.key.toLowerCase() === "a") keys.left = false;
+  if (e.key === "ArrowRight" || e.key.toLowerCase() === "d") keys.right = false;
+  if (e.key === "ArrowUp" || e.key.toLowerCase() === "w") keys.up = false;
+  if (e.key === "ArrowDown" || e.key.toLowerCase() === "s") keys.down = false;
+  if (e.code === "Space") keys.fire = false;
+});
+
+setupCameraSliders();
+setupSpawnEnemyButton();
+
+loop();
