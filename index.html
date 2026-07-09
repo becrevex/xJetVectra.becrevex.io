@@ -34,6 +34,12 @@
       Camera Y
       <input id="cameraHeight" type="range" min="-120" max="120" value="120">
     </label>
+
+    <div id="weaponSelect">
+      <button id="selectPrimaryBtn" class="weaponSelectButton primaryWeapon" title="Primary">P</button>
+      <button id="selectMissileBtn" class="weaponSelectButton missileWeapon" title="Missile">M</button>
+      <button id="selectBombBtn" class="weaponSelectButton bombWeapon" title="Bomb">B</button>
+    </div>
   </div>
 
   <div id="controls">
@@ -45,6 +51,17 @@
     <button id="rightFireBtn" class="miniFire rightMini">●</button>
     <button id="rightBtn" class="control right">R</button>
   </div>
-  <script src="game.js"></script>
+  <script src="js/state.js"></script>
+  <script src="js/core.js"></script>
+  <script src="js/controls.js"></script>
+  <script src="js/camera.js"></script>
+  <script src="js/ship.js"></script>
+  <script src="js/weapons.js"></script>
+  <script src="js/enemies.js"></script>
+  <script src="js/level.js"></script>
+  <script src="js/effects.js"></script>
+  <script src="js/graphics.js"></script>
+  <script src="js/loop.js"></script>
+  <script src="js/boot.js"></script>
 </body>
 </html>
