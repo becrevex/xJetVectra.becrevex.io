@@ -76,22 +76,11 @@ function updateInput() {
 
   ship.targetY = SHIP_BASE_Y + vertical * verticalDrift;
 
-  // Keep the nose locked to the starfield/perspective point. Any current
-  // thumb pitch trim is constrained to about 5 degrees so it never breaks
-  // the illusion that the fighter is flying toward the perspective point.
-  const pitchTrim = clamp(
-    (keys.aimPitch || 0) * NOSE_LOCK_EXTRA_RANGE,
-    -NOSE_LOCK_EXTRA_RANGE,
-    NOSE_LOCK_EXTRA_RANGE
-  );
+  // Hard-lock the ship nose to the active perspective/vanishing point.
+  // Directional weapon aim now belongs to the fire buttons, not the ship nose.
+  ship.targetPitch = perspectiveAim.pitch;
 
-  ship.targetPitch = clamp(
-    perspectiveAim.pitch + pitchTrim,
-    perspectiveAim.pitch - NOSE_LOCK_EXTRA_RANGE,
-    perspectiveAim.pitch + NOSE_LOCK_EXTRA_RANGE
-  );
-
-  if (keys.fire) fireWeapon();
+  if (keys.fire) fireWeapon(false);
 }
 
 function updateShip() {
@@ -104,10 +93,10 @@ function updateShip() {
     ship.x = barrelRoll.startX + (targetEdgeX - barrelRoll.startX) * eased;
     ship.roll = barrelRoll.startRoll + barrelRoll.direction * Math.PI * 2 * eased;
     const perspectiveAim = getPerspectiveAimAngles();
-    ship.yaw += (perspectiveAim.yaw - ship.yaw) * 0.18;
+    ship.yaw += (perspectiveAim.yaw - ship.yaw) * 0.22;
 
     ship.y += (ship.targetY - ship.y) * 0.045;
-    ship.pitch += (ship.targetPitch - ship.pitch) * 0.08;
+    ship.pitch += (ship.targetPitch - ship.pitch) * 0.22;
 
     if (t >= 1) {
       barrelRoll.active = false;
@@ -136,8 +125,8 @@ function updateShip() {
   ship.x += (ship.targetX - ship.x) * 0.045;
   ship.y += (ship.targetY - ship.y) * 0.045;
   ship.roll += (ship.targetRoll - ship.roll) * 0.08;
-  ship.yaw += (ship.targetYaw - ship.yaw) * 0.08;
-  ship.pitch += (ship.targetPitch - ship.pitch) * 0.08;
+  ship.yaw += (ship.targetYaw - ship.yaw) * 0.22;
+  ship.pitch += (ship.targetPitch - ship.pitch) * 0.22;
 }
 
 function getNoseDirection() {
@@ -149,6 +138,21 @@ function getNoseDirection() {
   const dz = nose.z - rear.z;
 
   const length = Math.sqrt(dx * dx + dy * dy + dz * dz);
+
+  return {
+    x: dx / length,
+    y: dy / length,
+    z: dz / length
+  };
+}
+
+function getPerspectiveDirectionFrom(origin, z = NOSE_PERSPECTIVE_LOCK_Z) {
+  const target = getPerspectiveWorldPoint(z);
+
+  const dx = target.x - origin.x;
+  const dy = target.y - origin.y;
+  const dz = target.z - origin.z;
+  const length = Math.max(1, Math.sqrt(dx * dx + dy * dy + dz * dz));
 
   return {
     x: dx / length,

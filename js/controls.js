@@ -199,8 +199,11 @@ function bindFireAimButton(id) {
       fireAim.active = true;
       fireAim.x = 0;
       fireAim.y = 0;
+      fireButtonConsumed = false;
 
-      keys.fire = true;
+      // Primary can continue firing while held. Missiles and bombs use the
+      // release gesture so the player can press, slide-aim, then launch once.
+      keys.fire = weaponTypes[selectedWeaponIndex] === "PRIMARY";
   }
 
   function moveAim(e) {
@@ -215,9 +218,14 @@ function bindFireAimButton(id) {
   function endAim(e) {
       e.preventDefault();
 
+      if (fireAim.active && weaponTypes[selectedWeaponIndex] !== "PRIMARY") {
+        fireWeapon(true);
+      }
+
       fireAim.active = false;
       fireAim.x = 0;
       fireAim.y = 0;
+      fireButtonConsumed = false;
 
       keys.fire = false;
   }
@@ -237,9 +245,14 @@ function bindFireAimButton(id) {
   });
 
   window.addEventListener("mouseup", () => {
+      if (fireAim.active && weaponTypes[selectedWeaponIndex] !== "PRIMARY") {
+        fireWeapon(true);
+      }
+
       fireAim.active = false;
       fireAim.x = 0;
       fireAim.y = 0;
+      fireButtonConsumed = false;
       keys.fire = false;
   });
 }

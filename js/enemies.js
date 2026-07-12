@@ -205,7 +205,9 @@ function updateEnemies() {
       continue;
     }
 
-    if (enemy.z < -260) {
+    // Let missed enemies continue past the player and grow toward the camera,
+    // then remove them only after they have clearly surpassed the camera plane.
+    if (enemy.z < camera.z - 180) {
       enemies.splice(i, 1);
     }
   }

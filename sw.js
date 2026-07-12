@@ -1,4 +1,4 @@
-const CACHE_NAME = "xJetVectra-v0.3.6-perspective-lock-enemy-intercept";
+const CACHE_NAME = "xJetVectra-v0.3.7-vanishing-fire-enemy-pass";
 
 const CORE_FILES = [
   "./",

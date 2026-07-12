@@ -117,7 +117,14 @@ window.addEventListener("keydown", e => {
 
   if (e.code === "Space") {
     e.preventDefault();
-    keys.fire = true;
+
+    if (!keys.fire) {
+      if (weaponTypes[selectedWeaponIndex] === "PRIMARY") {
+        keys.fire = true;
+      } else {
+        fireWeapon(true);
+      }
+    }
   }
 
   if (e.key.toLowerCase() === "q") {

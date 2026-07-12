@@ -1,9 +1,13 @@
 // Player weapons and projectile rendering.
 
-function fireWeapon() {
+function fireWeapon(forceSingleShot = false) {
   if (fireCooldown > 0) return;
 
   const weapon = weaponTypes[selectedWeaponIndex];
+
+  // Primary remains semi-automatic while held. Missiles and bombs are deliberate
+  // one-shot weapons: each shot requires a fresh press/release or key tap.
+  if (weapon !== "PRIMARY" && !forceSingleShot) return;
 
   let speed = 58;
   let life = 75;
@@ -14,20 +18,18 @@ function fireWeapon() {
     speed = 42;
     life = 110;
     size = 1.6;
-    cooldown = 18;
+    cooldown = 10;
   }
 
   if (weapon === "BOMB") {
     speed = 30;
     life = 95;
     size = 2.4;
-    cooldown = 32;
+    cooldown = 16;
   }
 
-  const baseDir = getNoseDirection();
-
-  fireFromGun("left", { x: -34, y: 8, z: 120 }, baseDir, weapon, speed, life, size);
-  fireFromGun("right", { x: 34, y: 8, z: 120 }, baseDir, weapon, speed, life, size);
+  fireFromGun("left", { x: -34, y: 8, z: 120 }, weapon, speed, life, size);
+  fireFromGun("right", { x: 34, y: 8, z: 120 }, weapon, speed, life, size);
 
   if (typeof playWeaponFireSound === "function") {
     playWeaponFireSound(weapon);
@@ -36,11 +38,11 @@ function fireWeapon() {
   fireCooldown = cooldown;
 }
 
-function fireFromGun(side, muzzleLocal, baseDir, weapon, speed, life, size) {
+function fireFromGun(side, muzzleLocal, weapon, speed, life, size) {
   const muzzle = rotatePoint(muzzleLocal);
-  let dir = { ...baseDir };
+  let dir = getPerspectiveDirectionFrom(muzzle);
 
-  if (weapon === "PRIMARY" && fireAim.active) {
+  if (fireAim.active) {
     dir.x += fireAim.x * FIRE_AIM_STRENGTH;
     dir.y += fireAim.y * FIRE_AIM_STRENGTH;
 
