@@ -59,6 +59,67 @@ for (const weapon of weaponTypes) {
   btn.addEventListener("touchstart", e => selectWeapon(weapon, e));
 }
 
+const weaponSelectPanel = document.getElementById("weaponSelect");
+
+function selectWeaponFromPoint(clientX, clientY, e = null) {
+  const element = document.elementFromPoint(clientX, clientY);
+  const button = element && element.closest
+    ? element.closest(".weaponSelectButton")
+    : null;
+
+  if (!button) return;
+
+  if (button.id === "selectPrimaryBtn") selectWeapon("PRIMARY", e);
+  if (button.id === "selectMissileBtn") selectWeapon("MISSILE", e);
+  if (button.id === "selectBombBtn") selectWeapon("BOMB", e);
+}
+
+if (weaponSelectPanel) {
+  let selectingWeaponBySlide = false;
+
+  weaponSelectPanel.addEventListener("touchstart", e => {
+    e.preventDefault();
+    selectingWeaponBySlide = true;
+
+    const touch = e.changedTouches[0];
+    selectWeaponFromPoint(touch.clientX, touch.clientY, e);
+  }, { passive: false });
+
+  weaponSelectPanel.addEventListener("touchmove", e => {
+    if (!selectingWeaponBySlide) return;
+
+    e.preventDefault();
+    const touch = e.changedTouches[0];
+    selectWeaponFromPoint(touch.clientX, touch.clientY, e);
+  }, { passive: false });
+
+  weaponSelectPanel.addEventListener("touchend", e => {
+    e.preventDefault();
+    selectingWeaponBySlide = false;
+  }, { passive: false });
+
+  weaponSelectPanel.addEventListener("touchcancel", e => {
+    e.preventDefault();
+    selectingWeaponBySlide = false;
+  }, { passive: false });
+
+  weaponSelectPanel.addEventListener("pointerdown", e => {
+    if (e.pointerType === "touch") return;
+    selectingWeaponBySlide = true;
+    selectWeaponFromPoint(e.clientX, e.clientY, e);
+  });
+
+  window.addEventListener("pointermove", e => {
+    if (!selectingWeaponBySlide || e.pointerType === "touch") return;
+    selectWeaponFromPoint(e.clientX, e.clientY, e);
+  });
+
+  window.addEventListener("pointerup", e => {
+    if (e.pointerType === "touch") return;
+    selectingWeaponBySlide = false;
+  });
+}
+
 refreshWeaponSelectionUI();
 
 const fullscreenBtn = document.getElementById("fullscreenBtn");
@@ -129,7 +190,7 @@ window.addEventListener("keydown", e => {
 
   if (e.key.toLowerCase() === "q") {
     selectedWeaponIndex = (selectedWeaponIndex + 1) % weaponTypes.length;
-    if (weaponCycleBtn) weaponCycleBtn.textContent = weaponTypes[selectedWeaponIndex];
+    refreshWeaponSelectionUI();
   }
 
   if (e.key.toLowerCase() === "e") {

@@ -1,4 +1,4 @@
-const CACHE_NAME = "xJetVectra-v0.3.10-starfield-enemy-speed";
+const CACHE_NAME = "xJetVectra-v0.3.12-lauren-weapon-slider";
 
 const CORE_FILES = [
   "./",

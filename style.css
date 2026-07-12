@@ -53,21 +53,22 @@ body {
 #weaponSelect {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 6px;
   margin-top: 6px;
   align-items: flex-end;
 
   /* Pushes the weapon buttons closer to the right edge */
   transform: translateX(48px);
+  touch-action: none;
 }
 
 .weaponSelectButton {
-  width: 26px;
-  height: 26px;
-  border-radius: 3px;
+  width: 30px;
+  height: 30px;
+  border-radius: 4px;
   border: 2px solid rgba(255, 255, 255, 0.85);
   color: black;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 900;
   line-height: 1;
   text-align: center;
@@ -82,12 +83,13 @@ body {
 }
 
 .primaryWeapon {
-  background: rgb(255, 220, 60);
+  background: rgb(60, 190, 255);
+  color: #001622;
 }
 
 .missileWeapon {
-  background: rgb(150, 80, 255);
-  color: white;
+  background: linear-gradient(135deg, #bfc7cc 0%, #8f989e 49%, #d91f2a 50%, #f34848 100%);
+  color: #101010;
 }
 
 .bombWeapon {
@@ -120,15 +122,15 @@ body {
   }
 
   #weaponSelect {
-    gap: 3px;
+    gap: 4px;
     margin-top: 3px;
     transform: translateX(28px);
   }
 
   .weaponSelectButton {
-    width: 20px;
-    height: 20px;
-    font-size: 9px;
+    width: 23px;
+    height: 23px;
+    font-size: 10px;
     border-width: 1px;
   }
 }
