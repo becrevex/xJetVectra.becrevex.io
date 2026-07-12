@@ -28,10 +28,11 @@ const ENEMY_SPEED_MULTIPLIER = 1.25; // make all enemies 25% faster
 const ENEMY_TYPES = {
   SPHERE_SMALL: {
     label: "Small Sphere",
-    radius: 42,
-    hp: 32,
+    shape: "sphere",
+    radius: 30,
+    hp: 24,
     speed: 22.5,
-    damage: 16,
+    damage: 12,
     score: 650,
     palette: {
       highlight: "rgba(235,255,255,0.98)",
@@ -43,6 +44,7 @@ const ENEMY_TYPES = {
 
   SPHERE_MEDIUM: {
     label: "Medium Sphere",
+    shape: "sphere",
     radius: 62,
     hp: 72,
     speed: 32.5,
@@ -58,6 +60,7 @@ const ENEMY_TYPES = {
 
   SPHERE_LARGE: {
     label: "Large Sphere",
+    shape: "sphere",
     radius: 86,
     hp: 135,
     speed: 45,
@@ -68,6 +71,38 @@ const ENEMY_TYPES = {
       mid: "rgba(255,80,205,0.95)",
       dark: "rgba(100,20,90,0.95)",
       ring: "rgba(255,150,235,0.82)"
+    }
+  },
+
+  ROCK_LARGE: {
+    label: "Large Rock",
+    shape: "rock",
+    radius: 96,
+    hp: 180,
+    speed: 34,
+    damage: 42,
+    score: 1200,
+    palette: {
+      highlight: "rgba(210,205,190,0.98)",
+      mid: "rgba(132,118,100,0.95)",
+      dark: "rgba(55,48,45,0.96)",
+      ring: "rgba(210,198,170,0.55)"
+    }
+  },
+
+  WRECKAGE: {
+    label: "Ship Wreckage",
+    shape: "wreckage",
+    radius: 110,
+    hp: 220,
+    speed: 38,
+    damage: 50,
+    score: 1400,
+    palette: {
+      highlight: "rgba(230,238,245,0.98)",
+      mid: "rgba(120,136,150,0.95)",
+      dark: "rgba(42,52,62,0.96)",
+      ring: "rgba(170,205,235,0.5)"
     }
   }
 };
@@ -87,8 +122,22 @@ let levelScore = 0;
 
 const stageComplete = {
   active: false,
-  startTime: 0
-}
+  startTime: 0,
+  nextLevelIndex: null,
+  advanced: false
+};
+
+const stageIntro = {
+  active: false,
+  startTime: 0,
+  text: ""
+};
+
+const gameOver = {
+  active: false,
+  startTime: 0,
+  handled: false
+};
 
 const CAMERA_ZOOM_MAX = -120;
 const CAMERA_ZOOM_MIN = -900;
@@ -96,75 +145,33 @@ const CAMERA_ZOOM_PLAY = DEFAULT_CAMERA_ZOOM; // default 0% / fully zoomed out
 
 const LEVELS = [
   {
-    name: "Level 1",
+    name: "Stage 1",
     duration: 120,
     events: [
-      // Warm-up: slow, easy targets.
-      {
-        start: 4,
-        end: 8,
-        type: "wave",
-        enemy: "SPHERE_SMALL",
-        count: 2,
-        interval: 1.2
-      },
+      { start: 4, end: 8, type: "wave", enemy: "SPHERE_SMALL", count: 2, interval: 1.2 },
+      { start: 10, end: 22, type: "wave", enemy: "SPHERE_SMALL", count: 7, interval: 1.35 },
+      { start: 24, end: 42, type: "random", pool: ["SPHERE_SMALL", "SPHERE_MEDIUM"], interval: 1.3 },
+      { start: 45, end: 64, type: "wave", enemy: "SPHERE_MEDIUM", count: 9, interval: 1.15 },
+      { start: 67, end: 82, type: "wave", enemy: "SPHERE_LARGE", count: 5, interval: 1.6 },
+      { start: 84, end: 104, type: "random", pool: ["SPHERE_SMALL", "SPHERE_MEDIUM", "SPHERE_LARGE"], interval: 1.0 },
+      { start: 106, end: 116, type: "random", pool: ["SPHERE_MEDIUM", "SPHERE_LARGE"], interval: 0.85 }
+    ]
+  },
 
-      // First proper wave.
-      {
-        start: 10,
-        end: 22,
-        type: "wave",
-        enemy: "SPHERE_SMALL",
-        count: 7,
-        interval: 1.35
-      },
-
-      // Introduce medium enemies.
-      {
-        start: 24,
-        end: 42,
-        type: "random",
-        pool: ["SPHERE_SMALL", "SPHERE_MEDIUM"],
-        interval: 1.3
-      },
-
-      // Heavier attack wave.
-      {
-        start: 45,
-        end: 64,
-        type: "wave",
-        enemy: "SPHERE_MEDIUM",
-        count: 9,
-        interval: 1.15
-      },
-
-      // Large enemies are faster and more dangerous.
-      {
-        start: 67,
-        end: 82,
-        type: "wave",
-        enemy: "SPHERE_LARGE",
-        count: 5,
-        interval: 1.6
-      },
-
-      // Mixed late-level pressure.
-      {
-        start: 84,
-        end: 104,
-        type: "random",
-        pool: ["SPHERE_SMALL", "SPHERE_MEDIUM", "SPHERE_LARGE"],
-        interval: 1.0
-      },
-
-      // Final rush.
-      {
-        start: 106,
-        end: 116,
-        type: "random",
-        pool: ["SPHERE_MEDIUM", "SPHERE_LARGE"],
-        interval: 0.85
-      }
+  {
+    name: "Stage 2",
+    duration: 130,
+    events: [
+      // Stage 2 doubles the enemy pressure and introduces non-enemy hazards.
+      { start: 3, end: 12, type: "wave", enemy: "SPHERE_SMALL", count: 5, interval: 0.75 },
+      { start: 12, end: 28, type: "random", pool: ["SPHERE_SMALL", "SPHERE_MEDIUM"], interval: 0.65 },
+      { start: 18, end: 36, type: "hazard", pool: ["ROCK_LARGE"], interval: 2.0 },
+      { start: 30, end: 52, type: "wave", enemy: "SPHERE_MEDIUM", count: 18, interval: 0.75 },
+      { start: 42, end: 62, type: "hazard", pool: ["ROCK_LARGE", "WRECKAGE"], interval: 1.65 },
+      { start: 58, end: 82, type: "random", pool: ["SPHERE_SMALL", "SPHERE_MEDIUM", "SPHERE_LARGE"], interval: 0.58 },
+      { start: 76, end: 102, type: "hazard", pool: ["ROCK_LARGE", "WRECKAGE"], interval: 1.35 },
+      { start: 94, end: 118, type: "random", pool: ["SPHERE_MEDIUM", "SPHERE_LARGE"], interval: 0.55 },
+      { start: 118, end: 128, type: "random", pool: ["SPHERE_SMALL", "SPHERE_MEDIUM", "SPHERE_LARGE", "WRECKAGE"], interval: 0.45 }
     ]
   }
 ];

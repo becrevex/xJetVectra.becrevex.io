@@ -1,25 +1,28 @@
-// Auto-split from the last known good monolithic build. Keep scripts loaded in index.html order.
+// Main frame loop.
 
 function loop() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   updateCamera();
-  updateLevel();
-  updateStageComplete();
-  updateInput();
-  updateShip();
-  updateStars();
-  updateEnemies();
-  updateShots();
+
+  if (!gameOver.active) {
+    updateLevel();
+    updateStageComplete();
+    updateInput();
+    updateShip();
+    updateStars();
+    updateEnemies();
+    updateShots();
+  }
+
+  // Explosions continue animating after ship destruction, while the starfield
+  // and gameplay motion are frozen for the game-over beat.
   updateExplosions();
-  //updateShipDebris();
-  
 
   drawStars();
   drawEnemies();
   drawShots();
   drawExplosions();
-  //drawShipDebris();
   drawShip();
   drawHud();
 

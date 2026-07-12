@@ -83,6 +83,30 @@ function drawHud() {
   ctx.font = "bold 18px system-ui, sans-serif";
   ctx.fillText(`SCORE ${levelScore}`, canvas.width / 2, 28);
 
+
+  if (stageIntro.active) {
+    const t = (performance.now() - stageIntro.startTime) / 1000;
+
+    if (t > 2.4) {
+      stageIntro.active = false;
+    } else {
+      const fadeIn = clamp(t / 0.35, 0, 1);
+      const fadeOut = clamp((2.4 - t) / 0.5, 0, 1);
+      const alpha = Math.min(fadeIn, fadeOut);
+
+      ctx.save();
+      ctx.textAlign = "center";
+      ctx.fillStyle = `rgba(255,255,255,${alpha})`;
+      ctx.font = "bold 52px system-ui, sans-serif";
+      ctx.fillText(stageIntro.text || "Stage", canvas.width / 2, canvas.height * 0.42);
+
+      ctx.fillStyle = `rgba(80,190,255,${alpha * 0.82})`;
+      ctx.font = "bold 16px system-ui, sans-serif";
+      ctx.fillText("Prepare for launch", canvas.width / 2, canvas.height * 0.42 + 32);
+      ctx.restore();
+    }
+  }
+
   if (stageComplete.active) {
     const t = (performance.now() - stageComplete.startTime) / 1000;
     const alpha = clamp(t / 0.5, 0, 1);

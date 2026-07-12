@@ -235,6 +235,8 @@ function getPerspectiveDirectionFrom(origin, z = NOSE_PERSPECTIVE_LOCK_Z) {
 }
 
 function drawShip() {
+  if (gameOver.active) return;
+
   const faces = [
     {
       color: "#8fa08f",

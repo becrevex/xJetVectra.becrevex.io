@@ -1,4 +1,4 @@
-const CACHE_NAME = "xJetVectra-v0.3.12-lauren-weapon-slider";
+const CACHE_NAME = "xJetVectra-v0.3.13-stage2-junk-level-select";
 
 const CORE_FILES = [
   "./",

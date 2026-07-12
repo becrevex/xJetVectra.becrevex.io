@@ -103,3 +103,11 @@ function playEnemyDestroyedForType(type) {
 ["pointerdown", "touchstart", "keydown"].forEach(eventName => {
   window.addEventListener(eventName, unlockAudio, { once: true, passive: true });
 });
+
+function playStageStart() {
+  // Short rising launch cue for stage start.
+  safeZzfx(.45,.02,260,.02,.08,.22,1,1.65,0,16,170,.08,0,0,0,.05,0,.78,.04,0,0);
+  setTimeout(() => {
+    safeZzfx(.28,.01,620,.01,.06,.18,0,1.35,0,8,110,.04,0,0,0,.03,0,.75,.02,0,0);
+  }, 140);
+}

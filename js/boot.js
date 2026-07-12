@@ -198,7 +198,7 @@ window.addEventListener("keydown", e => {
   }
 
   if (e.key.toLowerCase() === "l") {
-    startLevel(0);
+    showLevelSelectMenu();
   }
 });
 

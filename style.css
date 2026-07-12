@@ -267,3 +267,92 @@ button {
     display: none;
   }
 }
+
+.menuOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 12000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.72);
+  color: white;
+  text-align: center;
+  padding: 18px;
+}
+
+.menuCard {
+  min-width: min(320px, 86vw);
+  max-width: 420px;
+  border: 2px solid rgba(255, 255, 255, 0.75);
+  border-radius: 18px;
+  background: rgba(5, 10, 18, 0.92);
+  box-shadow: 0 0 34px rgba(70, 180, 255, 0.22);
+  padding: 20px;
+}
+
+.destroyedCard {
+  box-shadow: 0 0 36px rgba(255, 80, 80, 0.32);
+}
+
+.menuTitle {
+  font-size: 28px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+.menuSubtitle {
+  font-size: 13px;
+  opacity: 0.82;
+  margin-bottom: 16px;
+}
+
+.menuButtons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: stretch;
+}
+
+.menuButtons.horizontal {
+  flex-direction: row;
+  justify-content: center;
+}
+
+.menuButton {
+  min-width: 108px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  background: rgba(60, 190, 255, 0.25);
+  color: white;
+  font-weight: 900;
+  font-size: 15px;
+}
+
+.menuButton.secondary {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.menuButton:active {
+  transform: scale(0.97);
+}
+
+@media (pointer: coarse) {
+  .menuCard {
+    padding: 16px;
+    border-radius: 14px;
+  }
+
+  .menuTitle {
+    font-size: 22px;
+  }
+
+  .menuButton {
+    min-width: 92px;
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+}
