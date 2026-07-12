@@ -1,7 +1,37 @@
 // Auto-split from the last known good monolithic build. Keep scripts loaded in index.html order.
 
 function getWorldSpeedMultiplier() {
-  return keys.boost ? 3.25 : 1;
+  // Boost is intentionally disabled for now while the activation model is refined.
+  return 1;
+}
+
+function getPerspectiveWorldPoint(z = NOSE_PERSPECTIVE_LOCK_Z) {
+  const depth = z - camera.z;
+  const scale = FOV / depth;
+
+  return {
+    x: camera.x + starfieldPerspectiveX / scale,
+    y: camera.y + starfieldPerspectiveY / scale,
+    z
+  };
+}
+
+function getPerspectiveAimAngles() {
+  const target = getPerspectiveWorldPoint();
+
+  const dx = target.x - ship.x;
+  const dy = target.y - ship.y;
+  const dz = target.z - ship.z;
+
+  const horizontalDistance = Math.max(1, Math.sqrt(dx * dx + dz * dz));
+
+  return {
+    // rotatePoint's yaw convention is inverted: positive yaw moves the nose left.
+    yaw: -Math.atan2(dx, dz),
+
+    // rotatePoint's pitch convention is also inverted relative to screen Y.
+    pitch: -Math.atan2(dy, horizontalDistance)
+  };
 }
 
 function updateInput() {
@@ -13,10 +43,16 @@ function updateInput() {
   if (keys.up) vertical -= 1;
   if (keys.down) vertical += 1;
 
+  const perspectiveAim = getPerspectiveAimAngles();
+
   if (!barrelRoll.active) {
     ship.targetX = horizontal * DRIFT_X;
     ship.targetRoll = horizontal * MAX_ROLL;
-    ship.targetYaw = horizontal * MAX_YAW;
+
+    // The ship's nose should remain visually tied to the current perspective
+    // point. Banking/drifting changes the body position, but the nose remains
+    // pointed toward the vanishing point with only a tiny optional trim.
+    ship.targetYaw = perspectiveAim.yaw;
   }
 
   const leftTouchV = keys.leftTouchVertical || 0;
@@ -27,7 +63,8 @@ function updateInput() {
   rightTouchV === 0 &&
   Math.abs(keys.aimPitch || 0) < 0.08;
 
-  keys.boost = keys.left && keys.right && vertical === 0 && noStickSlide;
+  // Boost is intentionally disabled for now while the activation model is refined.
+  keys.boost = false;
 
   const bothSticksSameVertical =
     leftTouchV !== 0 &&
@@ -37,29 +74,21 @@ function updateInput() {
     ? 322.5
     : DRIFT_Y;
 
-  ship.targetY = 55 + vertical * verticalDrift;
+  ship.targetY = SHIP_BASE_Y + vertical * verticalDrift;
 
-  let pitch = 0;
-
-  /*
-    Normal behavior:
-    - One stick sliding up/down still pitches the nose.
-
-    Special behavior:
-    - Both sticks sliding straight up/down together moves the whole ship body
-      dramatically instead of just pitching the nose.
-  */
-  if (!bothSticksSameVertical) {
-    if (keys.up) pitch += MAX_PITCH * 1.35;
-    if (keys.down) pitch -= MAX_PITCH * 1.35;
-  }
-
-  pitch += keys.aimPitch * MAX_PITCH * 0.9;
+  // Keep the nose locked to the starfield/perspective point. Any current
+  // thumb pitch trim is constrained to about 5 degrees so it never breaks
+  // the illusion that the fighter is flying toward the perspective point.
+  const pitchTrim = clamp(
+    (keys.aimPitch || 0) * NOSE_LOCK_EXTRA_RANGE,
+    -NOSE_LOCK_EXTRA_RANGE,
+    NOSE_LOCK_EXTRA_RANGE
+  );
 
   ship.targetPitch = clamp(
-    pitch,
-    -MAX_PITCH * 1.5,
-    MAX_PITCH * 1.5
+    perspectiveAim.pitch + pitchTrim,
+    perspectiveAim.pitch - NOSE_LOCK_EXTRA_RANGE,
+    perspectiveAim.pitch + NOSE_LOCK_EXTRA_RANGE
   );
 
   if (keys.fire) fireWeapon();
@@ -74,26 +103,29 @@ function updateShip() {
 
     ship.x = barrelRoll.startX + (targetEdgeX - barrelRoll.startX) * eased;
     ship.roll = barrelRoll.startRoll + barrelRoll.direction * Math.PI * 2 * eased;
-    ship.yaw = barrelRoll.direction * MAX_YAW * 1.25;
+    const perspectiveAim = getPerspectiveAimAngles();
+    ship.yaw += (perspectiveAim.yaw - ship.yaw) * 0.18;
 
     ship.y += (ship.targetY - ship.y) * 0.045;
-    ship.pitch += (ship.targetPitch + keys.aimPitch * MAX_PITCH - ship.pitch) * 0.08;
+    ship.pitch += (ship.targetPitch - ship.pitch) * 0.08;
 
     if (t >= 1) {
       barrelRoll.active = false;
       ship.x = targetEdgeX;
       ship.targetX = targetEdgeX;
 
+      const perspectiveAim = getPerspectiveAimAngles();
+
       if (barrelRoll.direction < 0 && keys.left) {
         ship.targetRoll = -MAX_ROLL;
-        ship.targetYaw = -MAX_YAW;
       } else if (barrelRoll.direction > 0 && keys.right) {
         ship.targetRoll = MAX_ROLL;
-        ship.targetYaw = MAX_YAW;
       } else {
         ship.targetRoll = 0;
-        ship.targetYaw = 0;
       }
+
+      ship.targetYaw = perspectiveAim.yaw;
+      ship.targetPitch = perspectiveAim.pitch;
 
       ship.roll = ship.targetRoll;
     }

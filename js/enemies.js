@@ -66,24 +66,70 @@ function getEnemyConfig(type) {
   return ENEMY_TYPES[type] || ENEMY_TYPES.SPHERE_SMALL;
 }
 
+function getPerspectiveSpawnPoint(z = 2300, spreadX = 320, spreadY = 180) {
+  const depth = z - camera.z;
+  const scale = FOV / depth;
+
+  // Reverse the same vanishing-point offset used by the starfield so enemies
+  // originate from the active perspective plane instead of the static center.
+  const originX = camera.x + starfieldPerspectiveX / scale;
+  const originY = camera.y + starfieldPerspectiveY / scale;
+
+  return {
+    x: originX + randomRange(-spreadX, spreadX),
+    y: originY + randomRange(-spreadY, spreadY),
+    z
+  };
+}
+
 function spawnEnemy(type = "SPHERE_SMALL", options = {}) {
   const cfg = getEnemyConfig(type);
+  const spawnZ = options.z ?? 2300;
+  const spawnPoint = getPerspectiveSpawnPoint(
+    spawnZ,
+    options.spreadX ?? 320,
+    options.spreadY ?? 180
+  );
+
+  const x = options.x ?? spawnPoint.x;
+  const y = options.y ?? spawnPoint.y;
+  const z = spawnZ;
+
+  // Snapshot where the ship is at spawn time. The enemy does not continuously
+  // home in; it commits to the attack vector it had when it entered the scene.
+  // If the player holds position and does not destroy it, collision is expected.
+  const targetX = options.targetX ?? ship.x;
+  const targetY = options.targetY ?? ship.y;
+  const targetZ = options.targetZ ?? ship.z;
+
+  const dx = targetX - x;
+  const dy = targetY - y;
+  const dz = targetZ - z;
+  const len = Math.max(1, Math.sqrt(dx * dx + dy * dy + dz * dz));
+
+  const speed = options.speed ?? cfg.speed;
 
   enemies.push({
     type,
     label: cfg.label,
-    x: options.x ?? 0,
-    y: options.y ?? 55,
-    z: options.z ?? 2300,
+    x,
+    y,
+    z,
     radius: options.radius ?? cfg.radius,
     hp: options.hp ?? cfg.hp,
     maxHp: options.hp ?? cfg.hp,
-    speed: options.speed ?? cfg.speed,
+    speed,
     damage: options.damage ?? cfg.damage,
     scoreValue: options.score ?? cfg.score,
     palette: cfg.palette,
     active: true,
-    spin: Math.random() * Math.PI * 2
+    spin: Math.random() * Math.PI * 2,
+    targetX,
+    targetY,
+    targetZ,
+    vx: (dx / len) * speed,
+    vy: (dy / len) * speed,
+    vz: (dz / len) * speed
   });
 }
 
@@ -127,7 +173,16 @@ function updateEnemies() {
       continue;
     }
 
-    enemy.z -= enemy.speed * getWorldSpeedMultiplier();
+    const speedMultiplier = getWorldSpeedMultiplier();
+
+    if (typeof enemy.vx === "number" && typeof enemy.vy === "number" && typeof enemy.vz === "number") {
+      enemy.x += enemy.vx * speedMultiplier;
+      enemy.y += enemy.vy * speedMultiplier;
+      enemy.z += enemy.vz * speedMultiplier;
+    } else {
+      enemy.z -= enemy.speed * speedMultiplier;
+    }
+
     enemy.spin += 0.035 + enemy.speed * 0.0008;
 
     const dx = enemy.x - ship.x;

@@ -9,6 +9,10 @@ const MAX_ROLL = Math.PI / 4;
 const MAX_YAW = Math.PI / 8;
 const MAX_PITCH = Math.PI / 7;
 const STARFIELD_BANK_SHIFT = 0.18; // fraction of screen width used to drift the starfield vanishing point
+const STARFIELD_VERTICAL_SHIFT = 0.14; // fraction of screen height used to drift the vanishing point during ascend/descend
+const NOSE_PERSPECTIVE_LOCK_Z = 1800; // far plane used by the ship to visually aim at the vanishing point
+const NOSE_LOCK_EXTRA_RANGE = Math.PI / 36; // keep any manual nose trim within roughly 5 degrees of the perspective point
+const SHIP_BASE_Y = 55;
 const TOUCH_AIM_RANGE = 95;
 const DRIFT_X = 180;
 const EDGE_X = 280;
@@ -215,6 +219,7 @@ const playerStatus = {
 };
 
 let starfieldPerspectiveX = 0;
+let starfieldPerspectiveY = 0;
 const stars = [];
 const shots = [];
 const explosions = [];

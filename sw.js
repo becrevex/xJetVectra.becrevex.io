@@ -1,4 +1,4 @@
-const CACHE_NAME = "xJetVectra-v0.3.4-starfield-bank-speed";
+const CACHE_NAME = "xJetVectra-v0.3.6-perspective-lock-enemy-intercept";
 
 const CORE_FILES = [
   "./",
