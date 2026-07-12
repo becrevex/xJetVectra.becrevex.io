@@ -44,6 +44,10 @@ function bindDirectionalTouchButton(id, sideKey) {
     ? "leftTouchVertical"
     : "rightTouchVertical";
 
+  const horizontalKey = sideKey === "left"
+    ? "leftTouchHorizontal"
+    : "rightTouchHorizontal";
+
   function syncVerticalKeys() {
     const leftV = keys.leftTouchVertical || 0;
     const rightV = keys.rightTouchVertical || 0;
@@ -63,13 +67,13 @@ function bindDirectionalTouchButton(id, sideKey) {
     }
   }
 
-  function clearTouchAiming() {
+  function clearTouchModifiers() {
     keys[verticalKey] = 0;
+    keys[horizontalKey] = 0;
     syncVerticalKeys();
-    keys.aimPitch = 0;
   }
 
-  function updateTouchAim(clientX, clientY) {
+  function updateTouchModifiers(clientX, clientY) {
     const dx = clientX - startX;
     const dy = clientY - startY;
     const verticalThreshold = 28;
@@ -85,13 +89,10 @@ function bindDirectionalTouchButton(id, sideKey) {
     keys[verticalKey] = verticalDirection;
     syncVerticalKeys();
 
-    const amount = clamp(dx / TOUCH_AIM_RANGE, -1, 1);
-
-    if (sideKey === "left") {
-      keys.aimPitch = amount;
-    } else {
-      keys.aimPitch = -amount;
-    }
+    // Horizontal slide on the held L/R button now controls bank/roll only.
+    // Weapon direction belongs to the fire buttons; the ship nose remains
+    // locked to the vanishing point.
+    keys[horizontalKey] = clamp(dx / TOUCH_AIM_RANGE, -1, 1);
   }
 
   btn.addEventListener("touchstart", e => {
@@ -104,7 +105,7 @@ function bindDirectionalTouchButton(id, sideKey) {
 
     checkDoubleTap(sideKey);
     keys[sideKey] = true;
-    clearTouchAiming();
+    clearTouchModifiers();
   });
 
   btn.addEventListener("touchmove", e => {
@@ -112,21 +113,21 @@ function bindDirectionalTouchButton(id, sideKey) {
     if (!active) return;
 
     const touch = e.changedTouches[0];
-    updateTouchAim(touch.clientX, touch.clientY);
+    updateTouchModifiers(touch.clientX, touch.clientY);
   });
 
   btn.addEventListener("touchend", e => {
     e.preventDefault();
     active = false;
     keys[sideKey] = false;
-    clearTouchAiming();
+    clearTouchModifiers();
   });
 
   btn.addEventListener("touchcancel", e => {
     e.preventDefault();
     active = false;
     keys[sideKey] = false;
-    clearTouchAiming();
+    clearTouchModifiers();
   });
 
   btn.addEventListener("mousedown", () => {
@@ -136,14 +137,14 @@ function bindDirectionalTouchButton(id, sideKey) {
 
   btn.addEventListener("mouseup", () => {
     keys[sideKey] = false;
-    keys.aimPitch = 0;
+    keys[horizontalKey] = 0;
     keys[verticalKey] = 0;
     syncVerticalKeys();
   });
 
   btn.addEventListener("mouseleave", () => {
     keys[sideKey] = false;
-    keys.aimPitch = 0;
+    keys[horizontalKey] = 0;
     keys[verticalKey] = 0;
     syncVerticalKeys();
   });

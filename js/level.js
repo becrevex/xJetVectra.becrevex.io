@@ -9,7 +9,7 @@ function startLevel(index = 0) {
   levelState.elapsed = 0;
   levelState.eventRuntime.clear();
 
-  levelState.introCamera = true;
+  levelState.introCamera = false;
   levelState.introStartTime = performance.now();
 
   enemies.length = 0;
@@ -19,7 +19,8 @@ function startLevel(index = 0) {
   playerStatus.shield = playerStatus.maxShield;
   playerStatus.health = playerStatus.maxHealth;
 
-  cameraSettings.zoom = CAMERA_ZOOM_MAX;
+  cameraSettings.zoom = DEFAULT_CAMERA_ZOOM;
+  cameraSettings.height = DEFAULT_CAMERA_HEIGHT;
 }
 
 function updateLevel() {
@@ -90,9 +91,9 @@ function runLevelEvent(event) {
     if (runtime.spawned >= event.count) return;
 
     spawnEnemy(event.enemy, {
-      x: randomRange(-140, 140),
-      y: randomRange(-70, 170),
-      z: 2300
+      z: ENEMY_SPAWN_Z,
+      spreadX: 360,
+      spreadY: 210
     });
 
     runtime.spawned++;
@@ -103,9 +104,9 @@ function runLevelEvent(event) {
     const enemyType = event.pool[Math.floor(Math.random() * event.pool.length)];
 
     spawnEnemy(enemyType, {
-      x: randomRange(-180, 180),
-      y: randomRange(-90, 190),
-      z: 2300
+      z: ENEMY_SPAWN_Z,
+      spreadX: 420,
+      spreadY: 240
     });
 
     runtime.lastSpawn = levelState.elapsed;

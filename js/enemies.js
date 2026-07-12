@@ -66,7 +66,7 @@ function getEnemyConfig(type) {
   return ENEMY_TYPES[type] || ENEMY_TYPES.SPHERE_SMALL;
 }
 
-function getPerspectiveSpawnPoint(z = 2300, spreadX = 320, spreadY = 180) {
+function getPerspectiveSpawnPoint(z = ENEMY_SPAWN_Z, spreadX = 360, spreadY = 210) {
   const depth = z - camera.z;
   const scale = FOV / depth;
 
@@ -84,11 +84,11 @@ function getPerspectiveSpawnPoint(z = 2300, spreadX = 320, spreadY = 180) {
 
 function spawnEnemy(type = "SPHERE_SMALL", options = {}) {
   const cfg = getEnemyConfig(type);
-  const spawnZ = options.z ?? 2300;
+  const spawnZ = options.z ?? ENEMY_SPAWN_Z;
   const spawnPoint = getPerspectiveSpawnPoint(
     spawnZ,
-    options.spreadX ?? 320,
-    options.spreadY ?? 180
+    options.spreadX ?? 360,
+    options.spreadY ?? 210
   );
 
   const x = options.x ?? spawnPoint.x;

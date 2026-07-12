@@ -4,7 +4,7 @@ const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 
 const FOV = 520;
-const SPEED = 20.8; // 20% slower starfield travel speed
+const SPEED = 26; // v0.3.10: 25% faster than the slowed v0.3.9 starfield
 const MAX_ROLL = Math.PI / 4;
 const MAX_YAW = Math.PI / 8;
 const MAX_PITCH = Math.PI / 7;
@@ -16,18 +16,21 @@ const SHIP_BASE_Y = 55;
 const TOUCH_AIM_RANGE = 95;
 const DRIFT_X = 180;
 const EDGE_X = 280;
+const EDGE_PUSH_THRESHOLD = 0.45;
 const DRIFT_Y = 112.5;
-const DEFAULT_CAMERA_ZOOM = -520;
+const DEFAULT_CAMERA_ZOOM = -900;
 const DEFAULT_CAMERA_HEIGHT = 120;
 const BARREL_TAP_WINDOW = 260;
 const BARREL_DURATION = 520;
 const PLAYER_RADIUS = 70;
+const ENEMY_SPAWN_Z = 3200; // spawn farther out so enemies begin smaller near the vantage plane
+const ENEMY_SPEED_MULTIPLIER = 1.25; // make all enemies 25% faster
 const ENEMY_TYPES = {
   SPHERE_SMALL: {
     label: "Small Sphere",
     radius: 42,
     hp: 32,
-    speed: 18,
+    speed: 22.5,
     damage: 16,
     score: 650,
     palette: {
@@ -42,7 +45,7 @@ const ENEMY_TYPES = {
     label: "Medium Sphere",
     radius: 62,
     hp: 72,
-    speed: 26,
+    speed: 32.5,
     damage: 24,
     score: 1100,
     palette: {
@@ -57,7 +60,7 @@ const ENEMY_TYPES = {
     label: "Large Sphere",
     radius: 86,
     hp: 135,
-    speed: 36,
+    speed: 45,
     damage: 34,
     score: 1800,
     palette: {
@@ -89,7 +92,7 @@ const stageComplete = {
 
 const CAMERA_ZOOM_MAX = -120;
 const CAMERA_ZOOM_MIN = -900;
-const CAMERA_ZOOM_PLAY = -588; // about 40%
+const CAMERA_ZOOM_PLAY = DEFAULT_CAMERA_ZOOM; // default 0% / fully zoomed out
 
 const LEVELS = [
   {
@@ -207,7 +210,8 @@ const keys = {
   up: false,
   down: false,
   fire: false,
-  aimPitch: 0
+  leftTouchHorizontal: 0,
+  rightTouchHorizontal: 0
 };
 
 const playerStatus = {

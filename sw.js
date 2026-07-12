@@ -1,4 +1,4 @@
-const CACHE_NAME = "xJetVectra-v0.3.7-vanishing-fire-enemy-pass";
+const CACHE_NAME = "xJetVectra-v0.3.10-starfield-enemy-speed";
 
 const CORE_FILES = [
   "./",

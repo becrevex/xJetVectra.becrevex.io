@@ -34,6 +34,75 @@ function getPerspectiveAimAngles() {
   };
 }
 
+
+function getTwoHandEdgePushDirection() {
+  const leftSlide = keys.leftTouchHorizontal || 0;
+  const rightSlide = keys.rightTouchHorizontal || 0;
+
+  const pushRight =
+    keys.right &&
+    rightSlide > EDGE_PUSH_THRESHOLD &&
+    keys.left &&
+    leftSlide > EDGE_PUSH_THRESHOLD;
+
+  const pushLeft =
+    keys.left &&
+    leftSlide < -EDGE_PUSH_THRESHOLD &&
+    keys.right &&
+    rightSlide < -EDGE_PUSH_THRESHOLD;
+
+  if (pushRight && !pushLeft) return 1;
+  if (pushLeft && !pushRight) return -1;
+  return 0;
+}
+
+function computeDirectionalBankRoll(horizontal) {
+  const maxVerticalRoll = Math.PI / 2;
+  const edgePushDirection = getTwoHandEdgePushDirection();
+
+  if (edgePushDirection !== 0) {
+    return edgePushDirection * maxVerticalRoll;
+  }
+
+  if (keys.left && !keys.right) {
+    const slide = keys.leftTouchHorizontal || 0;
+
+    if (slide < 0) {
+      // Hold L + slide left: deepen the left bank until the ship is vertical.
+      return lerp(-MAX_ROLL, -maxVerticalRoll, -slide);
+    }
+
+    if (slide > 0) {
+      // Hold L + slide right: roll the ship through to the opposite vertical
+      // attitude while keeping its spatial lane and starfield perspective on
+      // the left-side drift line.
+      return lerp(-MAX_ROLL, maxVerticalRoll, slide);
+    }
+
+    return -MAX_ROLL;
+  }
+
+  if (keys.right && !keys.left) {
+    const slide = keys.rightTouchHorizontal || 0;
+
+    if (slide > 0) {
+      // Hold R + slide right: deepen the right bank until the ship is vertical.
+      return lerp(MAX_ROLL, maxVerticalRoll, slide);
+    }
+
+    if (slide < 0) {
+      // Hold R + slide left: roll the ship through to the opposite vertical
+      // attitude while keeping its spatial lane and starfield perspective on
+      // the right-side drift line.
+      return lerp(MAX_ROLL, -maxVerticalRoll, -slide);
+    }
+
+    return MAX_ROLL;
+  }
+
+  return horizontal * MAX_ROLL;
+}
+
 function updateInput() {
   let horizontal = 0;
   let vertical = 0;
@@ -46,22 +115,27 @@ function updateInput() {
   const perspectiveAim = getPerspectiveAimAngles();
 
   if (!barrelRoll.active) {
-    ship.targetX = horizontal * DRIFT_X;
-    ship.targetRoll = horizontal * MAX_ROLL;
+    const edgePushDirection = getTwoHandEdgePushDirection();
+
+    // Normal L/R keeps the ship in its left/right drift lane. A two-hand push
+    // lets the player press farther into the same side, nearly to the edge of
+    // the playfield, without making opposite roll gestures drag the ship back
+    // toward center.
+    ship.targetX = edgePushDirection !== 0
+      ? edgePushDirection * EDGE_X * 0.96
+      : horizontal * DRIFT_X;
+
+    ship.targetRoll = computeDirectionalBankRoll(horizontal);
 
     // The ship's nose should remain visually tied to the current perspective
-    // point. Banking/drifting changes the body position, but the nose remains
-    // pointed toward the vanishing point with only a tiny optional trim.
+    // point. Banking/drifting changes the body position and roll attitude, but
+    // the nose remains pointed toward the vanishing point. Directional aiming
+    // belongs to the fire buttons.
     ship.targetYaw = perspectiveAim.yaw;
   }
 
   const leftTouchV = keys.leftTouchVertical || 0;
   const rightTouchV = keys.rightTouchVertical || 0;
-
-  const noStickSlide =
-  leftTouchV === 0 &&
-  rightTouchV === 0 &&
-  Math.abs(keys.aimPitch || 0) < 0.08;
 
   // Boost is intentionally disabled for now while the activation model is refined.
   keys.boost = false;
@@ -77,7 +151,6 @@ function updateInput() {
   ship.targetY = SHIP_BASE_Y + vertical * verticalDrift;
 
   // Hard-lock the ship nose to the active perspective/vanishing point.
-  // Directional weapon aim now belongs to the fire buttons, not the ship nose.
   ship.targetPitch = perspectiveAim.pitch;
 
   if (keys.fire) fireWeapon(false);
@@ -106,9 +179,9 @@ function updateShip() {
       const perspectiveAim = getPerspectiveAimAngles();
 
       if (barrelRoll.direction < 0 && keys.left) {
-        ship.targetRoll = -MAX_ROLL;
+        ship.targetRoll = computeDirectionalBankRoll(-1);
       } else if (barrelRoll.direction > 0 && keys.right) {
-        ship.targetRoll = MAX_ROLL;
+        ship.targetRoll = computeDirectionalBankRoll(1);
       } else {
         ship.targetRoll = 0;
       }

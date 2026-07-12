@@ -85,13 +85,14 @@ function updateExplosions() {
 }
 
 function updateStars() {
-  const bankAmount = clamp(ship.roll / MAX_ROLL, -1, 1);
+  // Perspective drift should follow where the ship is spatially drifting, not
+  // how it is rolled. This keeps the starfield stable when the player holds L
+  // but rolls right, or holds R but rolls left—the ship changes attitude, but
+  // it does not change lanes.
+  const spatialAmount = clamp(ship.targetX / DRIFT_X, -1.35, 1.35);
   const verticalAmount = clamp((SHIP_BASE_Y - ship.y) / DRIFT_Y, -1, 1);
 
-  // When the ship banks right, push the starfield vanishing point left.
-  // When the ship banks left, push it right. This makes the field feel like
-  // it is turning through space instead of scrolling straight at the player.
-  const targetPerspectiveX = -bankAmount * canvas.width * STARFIELD_BANK_SHIFT;
+  const targetPerspectiveX = -spatialAmount * canvas.width * STARFIELD_BANK_SHIFT;
 
   // When the ship ascends, push the vanishing point down.
   // When the ship descends, push the vanishing point up.
