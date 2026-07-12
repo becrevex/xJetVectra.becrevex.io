@@ -7,31 +7,34 @@ function setupSpawnEnemyButton() {
   if (!spawnBtn) {
     spawnBtn = document.createElement("button");
     spawnBtn.id = "spawnEnemyBtn";
-    spawnBtn.textContent = "SPAWN ENEMY";
+    spawnBtn.textContent = "Spawn";
     document.body.appendChild(spawnBtn);
   }
 
   if (!startBtn) {
     startBtn = document.createElement("button");
     startBtn.id = "startLevelBtn";
-    startBtn.textContent = "START GAME";
+    startBtn.textContent = "Start";
     document.body.appendChild(startBtn);
   }
+
+  spawnBtn.textContent = "Spawn";
+  startBtn.textContent = "Start";
 
   const baseStyle = {
     position: "fixed",
     left: "16px",
     zIndex: "9999",
-    padding: "8px 10px",
-    borderRadius: "8px",
+    padding: "4px 7px",
+    borderRadius: "6px",
     border: "1px solid rgba(255,255,255,0.75)",
     background: "rgba(0,0,0,0.55)",
     color: "white",
-    font: "bold 12px system-ui, sans-serif"
+    font: "bold 10px system-ui, sans-serif"
   };
 
-  Object.assign(spawnBtn.style, baseStyle, { top: "112px" });
-  Object.assign(startBtn.style, baseStyle, { top: "152px" });
+  Object.assign(spawnBtn.style, baseStyle, { top: "92px" });
+  Object.assign(startBtn.style, baseStyle, { top: "122px" });
 
   spawnBtn.addEventListener("click", e => {
     e.preventDefault();

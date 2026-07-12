@@ -34,7 +34,7 @@ function updateInput() {
     leftTouchV === rightTouchV;
 
   const verticalDrift = bothSticksSameVertical
-    ? 430
+    ? 322.5
     : DRIFT_Y;
 
   ship.targetY = 55 + vertical * verticalDrift;

@@ -1,4 +1,4 @@
-const CACHE_NAME = "xJetVectra-v0.3.2-mobile-missile-hud";
+const CACHE_NAME = "xJetVectra-v0.3.3-ui-colors-movement";
 
 const CORE_FILES = [
   "./",

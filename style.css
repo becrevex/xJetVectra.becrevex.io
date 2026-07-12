@@ -100,6 +100,39 @@ body {
   flex-direction: column;
 }
 
+#cameraControls input[type="range"] {
+  width: 140px;
+}
+
+@media (pointer: coarse) {
+  #cameraControls {
+    top: 8px;
+    right: 48px;
+    font-size: 10px;
+    gap: 4px;
+    padding: 5px;
+    border-radius: 6px;
+  }
+
+  #cameraControls input[type="range"] {
+    width: 70px;
+    height: 10px;
+  }
+
+  #weaponSelect {
+    gap: 3px;
+    margin-top: 3px;
+    transform: translateX(28px);
+  }
+
+  .weaponSelectButton {
+    width: 20px;
+    height: 20px;
+    font-size: 9px;
+    border-width: 1px;
+  }
+}
+
 #controls {
   position: fixed;
   bottom: env(safe-area-inset-bottom, 20px);

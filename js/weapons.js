@@ -198,8 +198,8 @@ function drawShots() {
       continue;
     }
 
-    ctx.strokeStyle = "rgba(255, 80, 40, 0.95)";
-    ctx.fillStyle = "rgba(255, 220, 80, 0.95)";
+    ctx.strokeStyle = "rgba(60, 190, 255, 0.98)";
+    ctx.fillStyle = "rgba(190, 240, 255, 0.98)";
     ctx.lineWidth = Math.max(2, head.scale * 8 * shot.size);
 
     ctx.beginPath();
@@ -225,7 +225,7 @@ function drawMissileShot(shot, head, tail) {
   const bodyEndX = head.x - (dx / len) * coneLength;
   const bodyEndY = head.y - (dy / len) * coneLength;
 
-  ctx.strokeStyle = "rgba(185, 215, 220, 0.96)";
+  ctx.strokeStyle = "rgba(176, 184, 190, 0.98)";
   ctx.lineWidth = bodyWidth;
   ctx.lineCap = "round";
 
@@ -235,7 +235,7 @@ function drawMissileShot(shot, head, tail) {
   ctx.stroke();
 
   ctx.lineCap = "butt";
-  ctx.fillStyle = "rgba(255, 95, 35, 0.98)";
+  ctx.fillStyle = "rgba(210, 24, 28, 0.98)";
 
   ctx.beginPath();
   ctx.moveTo(head.x, head.y);
@@ -244,10 +244,17 @@ function drawMissileShot(shot, head, tail) {
   ctx.closePath();
   ctx.fill();
 
-  ctx.fillStyle = "rgba(255, 180, 60, 0.82)";
+  ctx.fillStyle = "rgba(120, 126, 132, 0.72)";
   ctx.beginPath();
-  ctx.arc(tail.x, tail.y, bodyWidth * 0.55, 0, Math.PI * 2);
+  ctx.arc(tail.x, tail.y, bodyWidth * 0.46, 0, Math.PI * 2);
   ctx.fill();
+
+  ctx.strokeStyle = "rgba(235, 240, 245, 0.78)";
+  ctx.lineWidth = Math.max(1, bodyWidth * 0.18);
+  ctx.beginPath();
+  ctx.moveTo(tail.x, tail.y - bodyWidth * 0.25);
+  ctx.lineTo(bodyEndX, bodyEndY - bodyWidth * 0.25);
+  ctx.stroke();
 }
 
 function drawBombShot(shot, head) {
