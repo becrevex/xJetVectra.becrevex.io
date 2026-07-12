@@ -19,6 +19,10 @@ function createMissileExplosion(x, y, z, size = 1) {
 }
 
 function createBombExplosion(x, y, z) {
+  if (typeof playBombExplosion === "function") {
+    playBombExplosion();
+  }
+
   const p = project({ x, y, z });
 
   explosions.push({

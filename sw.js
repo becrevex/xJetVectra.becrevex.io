@@ -1,4 +1,4 @@
-const CACHE_NAME = "xJetVectra";
+const CACHE_NAME = "xJetVectra-v0.3.2-mobile-missile-hud";
 
 const CORE_FILES = [
   "./",
@@ -8,6 +8,7 @@ const CORE_FILES = [
 
   "./js/state.js",
   "./js/core.js",
+  "./js/sound.js",
   "./js/controls.js",
   "./js/camera.js",
   "./js/ship.js",

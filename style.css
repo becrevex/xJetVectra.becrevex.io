@@ -181,3 +181,54 @@ button {
     display: none;
   }
 }
+
+#rotateDeviceOverlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.92);
+  color: white;
+  padding: 24px;
+}
+
+.rotateCard {
+  max-width: 280px;
+  border: 2px solid rgba(255, 255, 255, 0.75);
+  border-radius: 18px;
+  padding: 24px 20px;
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 30px rgba(90, 170, 255, 0.22);
+}
+
+.rotateIcon {
+  font-size: 54px;
+  line-height: 1;
+  margin-bottom: 10px;
+}
+
+.rotateTitle {
+  font-size: 22px;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+
+.rotateText {
+  font-size: 14px;
+  opacity: 0.85;
+}
+
+@media (orientation: portrait) and (pointer: coarse) {
+  #rotateDeviceOverlay {
+    display: flex;
+  }
+
+  #controls,
+  #cameraControls,
+  #fullscreenBtn {
+    display: none;
+  }
+}

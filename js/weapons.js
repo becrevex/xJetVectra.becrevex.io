@@ -1,4 +1,4 @@
-// Auto-split from the last known good monolithic build. Keep scripts loaded in index.html order.
+// Player weapons and projectile rendering.
 
 function fireWeapon() {
   if (fireCooldown > 0) return;
@@ -29,12 +29,15 @@ function fireWeapon() {
   fireFromGun("left", { x: -34, y: 8, z: 120 }, baseDir, weapon, speed, life, size);
   fireFromGun("right", { x: 34, y: 8, z: 120 }, baseDir, weapon, speed, life, size);
 
+  if (typeof playWeaponFireSound === "function") {
+    playWeaponFireSound(weapon);
+  }
+
   fireCooldown = cooldown;
 }
 
 function fireFromGun(side, muzzleLocal, baseDir, weapon, speed, life, size) {
   const muzzle = rotatePoint(muzzleLocal);
-
   let dir = { ...baseDir };
 
   if (weapon === "PRIMARY" && fireAim.active) {
@@ -62,6 +65,46 @@ function fireFromGun(side, muzzleLocal, baseDir, weapon, speed, life, size) {
   });
 }
 
+function getShotDamage(shot) {
+  if (shot.type === "PRIMARY") return 12;
+  if (shot.type === "MISSILE") return 30;
+  return 60;
+}
+
+function getWeaponScoreMultiplier(shot) {
+  if (shot.type === "MISSILE") return 1.4;
+  if (shot.type === "BOMB") return 2.0;
+  return 1.0;
+}
+
+function detonateShot(shot, playSound = true) {
+  if (shot.type === "MISSILE") {
+    createMissileExplosion(shot.x, shot.y, shot.z, shot.size || 1);
+    if (playSound && typeof playMissileExplosion === "function") {
+      playMissileExplosion();
+    }
+    return;
+  }
+
+  if (shot.type === "BOMB") {
+    createBombExplosion(shot.x, shot.y, shot.z);
+    return;
+  }
+
+  createMissileExplosion(shot.x, shot.y, shot.z, 0.35);
+}
+
+function destroyEnemy(enemy) {
+  const distanceBonus = clamp(enemy.z / 2300, 0.15, 1);
+  levelScore += Math.round((enemy.scoreValue || 1000) * distanceBonus);
+
+  createMissileExplosion(enemy.x, enemy.y, enemy.z, Math.max(0.9, enemy.radius / 52));
+
+  if (typeof playEnemyDestroyedForType === "function") {
+    playEnemyDestroyedForType(enemy.type);
+  }
+}
+
 function updateShots() {
   if (fireCooldown > 0) fireCooldown--;
 
@@ -86,29 +129,27 @@ function updateShots() {
 
       if (dist < enemy.radius + (shot.radius || 0)) {
         hitTarget = true;
-
-        enemy.hp -= shot.type === "PRIMARY" ? 12 : shot.type === "MISSILE" ? 30 : 60;
-        if (enemy.hp <= 0) {
-          const distanceBonus = clamp(enemy.z / 2300, 0.15, 1);
-          const weaponMultiplier =
-            shot.type === "PRIMARY" ? 1 :
-            shot.type === "MISSILE" ? 1.4 :
-            2.0;
-        
-          levelScore += Math.round(1000 * distanceBonus * weaponMultiplier);
-        }
-
+        enemy.hp -= getShotDamage(shot);
 
         if (shot.type === "BOMB") {
           createBombExplosion(shot.x, shot.y, shot.z);
         } else if (shot.type === "MISSILE") {
-          createMissileExplosion(shot.x, shot.y, shot.z, shot.size || 1);
+          detonateShot(shot, true);
         } else {
-          createMissileExplosion(shot.x, shot.y, shot.z, 0.35);
+          detonateShot(shot, false);
         }
 
         if (enemy.hp <= 0) {
-          createMissileExplosion(enemy.x, enemy.y, enemy.z, 1.35);
+          const weaponMultiplier = getWeaponScoreMultiplier(shot);
+          const distanceBonus = clamp(enemy.z / 2300, 0.15, 1);
+          levelScore += Math.round((enemy.scoreValue || 1000) * distanceBonus * weaponMultiplier);
+
+          createMissileExplosion(enemy.x, enemy.y, enemy.z, Math.max(0.9, enemy.radius / 52));
+
+          if (typeof playEnemyDestroyedForType === "function") {
+            playEnemyDestroyedForType(enemy.type);
+          }
+
           enemies.splice(enemyIndex, 1);
         }
 
@@ -124,10 +165,10 @@ function updateShots() {
 
     if (hitTarget || expired) {
       if (!hitTarget) {
-        if (shot.type === "MISSILE") {
-          createMissileExplosion(shot.x, shot.y, shot.z, shot.size || 1);
-        } else if (shot.type === "BOMB") {
-          createBombExplosion(shot.x, shot.y, shot.z);
+        // Missiles should only explode on impact. They now simply burn out at terminus.
+        // Bombs still detonate at terminus because that is part of the bomb behavior.
+        if (shot.type === "BOMB") {
+          detonateShot(shot, true);
         }
       }
 

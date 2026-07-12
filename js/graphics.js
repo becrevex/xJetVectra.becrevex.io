@@ -24,18 +24,21 @@ function drawPolygon(points, fillStyle, strokeStyle = null) {
 }
 
 function drawHud() {
+  const isMobileHud = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
+  const hudScale = isMobileHud ? 0.5 : 1;
+
   const x = 16;
   const y = 16;
-  const width = 150;
-  const barHeight = 7;
-  const gap = 7;
+  const width = 150 * hudScale;
+  const barHeight = 7 * hudScale;
+  const gap = 7 * hudScale;
 
   const shieldPct = clamp(playerStatus.shield / playerStatus.maxShield, 0, 1);
   const healthPct = clamp(playerStatus.health / playerStatus.maxHealth, 0, 1);
 
   ctx.save();
 
-  ctx.font = "10px system-ui, sans-serif";
+  ctx.font = `${10 * hudScale}px system-ui, sans-serif`;
   ctx.fillStyle = "rgba(255,255,255,0.85)";
   ctx.fillText("SHIELD", x, y - 3);
 
@@ -47,14 +50,14 @@ function drawHud() {
   ctx.strokeRect(x, y, width, barHeight);
 
   ctx.fillStyle = "rgba(255,255,255,0.85)";
-  ctx.fillText("HEALTH", x, y + barHeight + gap + 17);
+  ctx.fillText("HEALTH", x, y + barHeight + gap + 17 * hudScale);
 
   ctx.fillStyle = "rgba(255,255,255,0.18)";
-  ctx.fillRect(x, y + barHeight + gap + 20, width, barHeight);
+  ctx.fillRect(x, y + barHeight + gap + 20 * hudScale, width, barHeight);
   ctx.fillStyle = "rgba(70,235,100,0.95)";
-  ctx.fillRect(x, y + barHeight + gap + 20, width * healthPct, barHeight);
+  ctx.fillRect(x, y + barHeight + gap + 20 * hudScale, width * healthPct, barHeight);
   ctx.strokeStyle = "rgba(255,255,255,0.55)";
-  ctx.strokeRect(x, y + barHeight + gap + 20, width, barHeight);
+  ctx.strokeRect(x, y + barHeight + gap + 20 * hudScale, width, barHeight);
 
   if (playerStatus.health <= 0) {
     ctx.fillStyle = "rgba(255,255,255,0.9)";
@@ -71,7 +74,7 @@ function drawHud() {
     ctx.fillText(
       `${level.name}  ${levelState.elapsed.toFixed(1)} / ${level.duration}s`,
       16,
-      78
+      50 + 28 * hudScale
     );
   }
 

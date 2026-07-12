@@ -70,6 +70,17 @@ if (fullscreenBtn) {
     try {
       if (!document.fullscreenElement) {
         await root.requestFullscreen();
+
+        // Best effort only: works on many Android browsers/PWAs after fullscreen,
+        // but iOS Safari may ignore orientation locks.
+        if (screen.orientation && screen.orientation.lock) {
+          try {
+            await screen.orientation.lock("landscape");
+          } catch (orientationErr) {
+            console.warn("Landscape lock not available:", orientationErr);
+          }
+        }
+
         fullscreenBtn.textContent = "X";
       } else {
         await document.exitFullscreen();
