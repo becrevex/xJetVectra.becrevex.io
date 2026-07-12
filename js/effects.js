@@ -85,6 +85,14 @@ function updateExplosions() {
 }
 
 function updateStars() {
+  const bankAmount = clamp(ship.roll / MAX_ROLL, -1, 1);
+
+  // When the ship banks right, push the starfield vanishing point left.
+  // When the ship banks left, push it right. This makes the field feel like
+  // it is turning through space instead of scrolling straight at the player.
+  const targetPerspectiveX = -bankAmount * canvas.width * STARFIELD_BANK_SHIFT;
+  starfieldPerspectiveX += (targetPerspectiveX - starfieldPerspectiveX) * 0.08;
+
   for (const star of stars) {
     const boostMultiplier = getWorldSpeedMultiplier();
     const starSpeed = stageComplete.active
@@ -101,11 +109,24 @@ function updateStars() {
   }
 }
 
+function projectStar(point) {
+  const z = point.z - camera.z;
+
+  if (z <= 1) return null;
+
+  const scale = FOV / z;
+
+  return {
+    x: canvas.width / 2 + starfieldPerspectiveX + (point.x - camera.x) * scale,
+    y: canvas.height / 2 + (point.y - camera.y) * scale,
+    scale
+  };
+}
 
 function drawStars() {
   for (const star of stars) {
-    const current = project(star);
-    const previous = project({
+    const current = projectStar(star);
+    const previous = projectStar({
       x: star.x,
       y: star.y,
       z: star.z + (stageComplete.active ? 260 : 70 * getWorldSpeedMultiplier())

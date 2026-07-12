@@ -1,4 +1,4 @@
-const CACHE_NAME = "xJetVectra-v0.3.3-ui-colors-movement";
+const CACHE_NAME = "xJetVectra-v0.3.4-starfield-bank-speed";
 
 const CORE_FILES = [
   "./",

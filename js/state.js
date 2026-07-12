@@ -4,10 +4,11 @@ const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 
 const FOV = 520;
-const SPEED = 26;
+const SPEED = 20.8; // 20% slower starfield travel speed
 const MAX_ROLL = Math.PI / 4;
 const MAX_YAW = Math.PI / 8;
 const MAX_PITCH = Math.PI / 7;
+const STARFIELD_BANK_SHIFT = 0.18; // fraction of screen width used to drift the starfield vanishing point
 const TOUCH_AIM_RANGE = 95;
 const DRIFT_X = 180;
 const EDGE_X = 280;
@@ -213,6 +214,7 @@ const playerStatus = {
   invulnFrames: 0,
 };
 
+let starfieldPerspectiveX = 0;
 const stars = [];
 const shots = [];
 const explosions = [];
